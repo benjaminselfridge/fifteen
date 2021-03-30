@@ -16,8 +16,14 @@ import Text.Printf ( printf )
 
 type Resource = ()
 
+-- | The only additional event we use is a timer event from the outside world
+-- telling us the current time so we can update the 'GameState'. It doesn't
+-- matter how often these ticks are received, as long as they are requently
+-- enough that we can know how many seconds has passed (so something like every
+-- tenth of a second should be sufficient).
 data FifteenEvent = Tick UTCTime
-                    -- ^ Current time, to be compared with start time of game
+                    -- ^ When we receive a 'Tick', we update the current time in
+                    -- the 'GameState'.
 
 data GameState = GameState { _gsBoard :: Board
                            , _gsRandomGen :: StdGen
