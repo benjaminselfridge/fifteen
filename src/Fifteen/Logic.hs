@@ -12,61 +12,6 @@ data Tile = T1  | T2  | T3  | T4
           | T13 | T14 | T15 | T0
   deriving (Eq, Show, Read, Ord)
 
-class SuccPred a where
-  mSucc :: a -> Maybe a
-  mPred :: a -> Maybe a
-
-data Row = R1 | R2 | R3 | R4
-  deriving (Eq, Show, Read, Ord)
-
-instance SuccPred Row where
-  mSucc R1 = Just R2
-  mSucc R2 = Just R3
-  mSucc R3 = Just R4
-  mSucc R4 = Nothing
-
-  mPred R1 = Nothing
-  mPred R2 = Just R1
-  mPred R3 = Just R2
-  mPred R4 = Just R3
-
-instance SuccPred Col where
-  mSucc C1 = Just C2
-  mSucc C2 = Just C3
-  mSucc C3 = Just C4
-  mSucc C4 = Nothing
-
-  mPred C1 = Nothing
-  mPred C2 = Just C1
-  mPred C3 = Just C2
-  mPred C4 = Just C3
-
-data Col = C1 | C2 | C3 | C4
-  deriving (Eq, Show, Read, Ord)
-
-newtype Board = Board (B.Bimap (Row,Col) Tile)
-  deriving (Eq, Show)
-
-solvedBoard :: Board
-solvedBoard = Board $ B.fromList $
-  [ ((R1, C1), T1)
-  , ((R1, C2), T2)
-  , ((R1, C3), T3)
-  , ((R1, C4), T4)
-  , ((R2, C1), T5)
-  , ((R2, C2), T6)
-  , ((R2, C3), T7)
-  , ((R2, C4), T8)
-  , ((R3, C1), T9)
-  , ((R3, C2), T10)
-  , ((R3, C3), T11)
-  , ((R3, C4), T12)
-  , ((R4, C1), T13)
-  , ((R4, C2), T14)
-  , ((R4, C3), T15)
-  , ((R4, C4), T0)
-  ]
-
 tileNum :: Tile -> Natural
 tileNum T1  = 1
 tileNum T2  = 2
@@ -95,6 +40,61 @@ tileAt (Board bm) r c = fromJust $ B.lookup (r, c) bm
 tileNumAt :: Board -> Row -> Col -> Natural
 tileNumAt b r c = tileNum (tileAt b r c)
 
+class SuccPred a where
+  mSucc :: a -> Maybe a
+  mPred :: a -> Maybe a
+
+data Row = R1 | R2 | R3 | R4
+  deriving (Eq, Show, Read, Ord)
+
+data Col = C1 | C2 | C3 | C4
+  deriving (Eq, Show, Read, Ord)
+
+instance SuccPred Row where
+  mSucc R1 = Just R2
+  mSucc R2 = Just R3
+  mSucc R3 = Just R4
+  mSucc R4 = Nothing
+
+  mPred R1 = Nothing
+  mPred R2 = Just R1
+  mPred R3 = Just R2
+  mPred R4 = Just R3
+
+instance SuccPred Col where
+  mSucc C1 = Just C2
+  mSucc C2 = Just C3
+  mSucc C3 = Just C4
+  mSucc C4 = Nothing
+
+  mPred C1 = Nothing
+  mPred C2 = Just C1
+  mPred C3 = Just C2
+  mPred C4 = Just C3
+
+newtype Board = Board (B.Bimap (Row,Col) Tile)
+  deriving (Eq, Show)
+
+solvedBoard :: Board
+solvedBoard = Board $ B.fromList $
+  [ ((R1, C1), T1)
+  , ((R1, C2), T2)
+  , ((R1, C3), T3)
+  , ((R1, C4), T4)
+  , ((R2, C1), T5)
+  , ((R2, C2), T6)
+  , ((R2, C3), T7)
+  , ((R2, C4), T8)
+  , ((R3, C1), T9)
+  , ((R3, C2), T10)
+  , ((R3, C3), T11)
+  , ((R3, C4), T12)
+  , ((R4, C1), T13)
+  , ((R4, C2), T14)
+  , ((R4, C3), T15)
+  , ((R4, C4), T0)
+  ]
+
 -- | A single move -- slide a tile up, down, left, or right.
 data Move = MUp | MDown | MLeft | MRight
   deriving (Eq, Show, Read, Enum)
@@ -110,10 +110,12 @@ randomTake g i | i <= 0 = ([], g)
                                  (as, g'') = randomTake g' (i-1)
                              in (a:as, g'')
 
+-- | Shuffle the board and return a new generator.
 shuffleBoard :: RandomGen g => g -> Board -> (Board, g)
 shuffleBoard g b = let (moves, g') = randomTake g 1000
                    in (foldr move b moves, g')
 
+-- | If the move is impossible, just silently return the input board.
 move :: Move -> Board -> Board
 move m (Board bm) =
   let (blankR, blankC) = fromJust $ B.lookupR T0 bm
