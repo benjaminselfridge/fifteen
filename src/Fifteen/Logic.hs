@@ -137,19 +137,4 @@ move m (Board bm) =
     _ -> Board bm
 
 isSolved :: Board -> Bool
-isSolved b = tileNumAt b R1 C1 == 1  &&
-             tileNumAt b R1 C2 == 2  &&
-             tileNumAt b R1 C3 == 3  &&
-             tileNumAt b R1 C4 == 4  &&
-             tileNumAt b R2 C1 == 5  &&
-             tileNumAt b R2 C2 == 6  &&
-             tileNumAt b R2 C3 == 7  &&
-             tileNumAt b R2 C4 == 8  &&
-             tileNumAt b R3 C1 == 9  &&
-             tileNumAt b R3 C2 == 10 &&
-             tileNumAt b R3 C3 == 11 &&
-             tileNumAt b R3 C4 == 12 &&
-             tileNumAt b R4 C1 == 13 &&
-             tileNumAt b R4 C2 == 14 &&
-             tileNumAt b R4 C3 == 15 &&
-             tileNumAt b R4 C4 == 0
+isSolved b = b == solvedBoard
